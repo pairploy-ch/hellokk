@@ -1,0 +1,225 @@
+<template>
+   <div class="min-h-screen relative overflow-hidden">
+    <div class="absolute inset-0">
+      <img 
+        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop" 
+        alt="Background"
+        class="w-full h-full object-cover"
+      >
+    </div>
+    
+    <!-- Background Overlay -->
+    <div class="absolute inset-0 bg-black/40">
+      <div class="absolute inset-0 bg-gradient-to-b from-gray-900/30 via-gray-800/20 to-gray-900/50"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/30 to-transparent"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative text-center py-16 z-10">
+      <h1 class="text-white text-xl font-light mb-2">Event</h1>
+      <h2 class="text-white text-5xl md:text-6xl" style="font-weight: 500;">กิจกรรมที่น่าสนใจ</h2>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="relative max-w-7xl mx-auto px-6 pb-20 z-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[500px]">
+        
+        <!-- Main Large Card - Left (Featured Attraction) -->
+        <div 
+          v-if="featuredAttraction"
+          class="md:col-span-1 bg-white rounded-md overflow-hidden hover:shadow-xl transition-all duration-300 group"
+        >
+          <div class="relative h-[20rem]">
+            <img 
+              :src="featuredAttraction.image" 
+              :alt="featuredAttraction.title"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            >
+            <div class="absolute top-4 right-4">
+              <button 
+                @click="handleShareClick(featuredAttraction)"
+                class="bg-white/20 backdrop-blur-sm p-2 rounded-md text-white hover:bg-white/30 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-500 text-sm mb-2" style="font-weight: 400;">{{ featuredAttraction.category }}</p>
+            <h3 class="text-base font-bold text-gray-800 mb-4 leading-tight" style="font-weight: 600;">
+              {{ featuredAttraction.title }}
+            </h3>
+            <button 
+              @click="handleMoreClick(featuredAttraction)"
+              class="flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              style="font-weight: 400;"
+            >
+              More
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column - 2x2 Grid (Other Attractions) -->
+        <div class="md:col-span-2 grid grid-cols-2 gap-4">
+          
+          <div 
+            v-for="attraction in regularAttractions" 
+            :key="attraction.id"
+            class="bg-white rounded-md overflow-hidden hover:shadow-xl transition-all duration-300 group"
+          >
+            <div class="relative h-[10rem]">
+              <img 
+                :src="attraction.image" 
+                :alt="attraction.title"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              >
+              <!-- Conditional rendering for watermark or share button -->
+              <div v-if="attraction.hasWatermark" class="absolute bottom-2 right-2">
+                <div class="bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md">
+                  <span class="text-white text-xs font-medium">teeID Travel</span>
+                </div>
+              </div>
+              <div v-else class="absolute top-2 right-2">
+                <button 
+                  @click="handleShareClick(attraction)"
+                  class="bg-white/20 backdrop-blur-sm p-1.5 rounded-md text-white hover:bg-white/30 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="p-3">
+              <p class="text-gray-500 text-xs mb-1" style="font-weight: 400;">{{ attraction.category }}</p>
+              <h3 class="text-sm font-bold text-gray-800 mb-2 leading-tight" style="font-weight: 600;">
+                {{ attraction.title }}
+              </h3>
+              <button 
+                @click="handleMoreClick(attraction)"
+                class="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                style="font-weight: 400;"
+              >
+                More
+                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Explore More Button -->
+    <div class="relative text-center pb-16 z-10">
+      <button class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-12 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+        Explore More
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+
+// Reactive data for attractions
+const attractions = ref([
+  {
+    id: 1,
+    category: 'สวนสาธารณะ',
+    title: 'ม่วงแผนนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก แนะนำ กิ่งกิ้วยอบแห้นในบ้องอย่าง "บ่อนก่ิ้นนท์" สีวเป็นที่เที่ยวขอบแก้นก่อนไปบางง่ายสะดวกสุด ๆ ...',
+    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
+    featured: true
+  },
+  {
+    id: 2,
+    category: 'สวนสาธารณะ',
+    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
+    image: 'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400&h=200&fit=crop'
+  },
+  {
+    id: 3,
+    category: 'สวนสาธารณะ',
+    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
+    image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=200&fit=crop'
+  },
+  {
+    id: 4,
+    category: 'สวนสาธารณะ',
+    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
+    hasWatermark: true
+  },
+  {
+    id: 5,
+    category: 'สวนสาธารณะ',
+    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop'
+  }
+])
+
+// Computed properties to separate featured and regular attractions
+const featuredAttraction = computed(() => {
+  return attractions.value.find(attraction => attraction.featured)
+})
+
+const regularAttractions = computed(() => {
+  return attractions.value.filter(attraction => !attraction.featured).slice(0, 4)
+})
+
+// Methods
+const handleMoreClick = (attraction) => {
+  console.log('More clicked for:', attraction.title)
+  // Add navigation logic here
+  // For example: router.push(`/attraction/${attraction.id}`)
+}
+
+const handleShareClick = (attraction) => {
+  console.log('Share clicked for:', attraction.title)
+  // Add share logic here
+  // For example: share attraction URL or open share modal
+}
+</script>
+
+<style scoped>
+/* Water ripple effect (optional enhancement) */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.water-ripple::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: ripple 3s infinite;
+}
+
+/* Custom hover effects */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+/* Glassmorphism effect for buttons */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+</style>

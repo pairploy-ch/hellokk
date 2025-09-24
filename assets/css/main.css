@@ -1,0 +1,18 @@
+/* โหลดฟอนต์ Kanit จาก Google */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* ตั้งฟอนต์ทั้งระบบ */
+body {
+  font-family: 'Kanit', sans-serif !important;
+  font-weight: 600 !important;
+  
+}
+
+.font-kanit {
+    font-family: 'Kanit'!important;
+}
