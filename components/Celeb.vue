@@ -9,8 +9,24 @@
         </h2>
       </div>
 
+      <!-- Loading State -->
+      <div v-if="loading" class="bg-gray-100 p-6 pt-8 relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div v-for="i in 4" :key="i" class="flex flex-col items-start animate-pulse">
+            <div class="flex">
+              <div class="w-20 h-20 bg-gray-300 rounded-full mb-4"></div>
+              <div class="ml-3">
+                <div class="w-24 h-4 bg-gray-300 rounded mb-2"></div>
+                <div class="w-32 h-5 bg-gray-300 rounded mb-3"></div>
+                <div class="w-16 h-4 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Slider Container -->
-      <div class="bg-gray-100 p-6 pt-8 relative overflow-hidden">
+      <div v-else class="bg-gray-100 p-6 pt-8 relative overflow-hidden">
         <div class="relative">
           <!-- Slides -->
           <div
@@ -31,7 +47,7 @@
                   <div class="flex">
                     <div class="w-20 h-20 rounded-full overflow-hidden mb-4">
                       <img
-                        :src="profile.image"
+                        :src="profile.profile"
                         :alt="profile.name"
                         class="w-full h-full object-cover"
                       />
@@ -114,73 +130,36 @@
 </template>
 
 <script setup>
-// Profile data - you can expand this with more profiles
-const allProfiles = ref([
-  {
-    id: 1,
-    name: "ณนตนั กฎีชิจะ",
-    category: "ดารา/นักแสดง",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "nontana-kadeecha",
-  },
-  {
-    id: 2,
-    name: "ศุกลวัฒน์ คนบารร",
-    category: "ดารา/นักแสดง",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "sukolwat-kanbara",
-  },
-  {
-    id: 3,
-    name: "อฮบrjun hi end",
-    category: "Content creator",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "ahrbjun-hi-end",
-  },
-  {
-    id: 4,
-    name: "เชฟไผตาล",
-    category: "เชฟ",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "chef-paitaal",
-  },
-  {
-    id: 5,
-    name: "นักร้องคนที่ 1",
-    category: "นักร้อง",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "singer-1",
-  },
-  {
-    id: 6,
-    name: "นักกีฬาคนที่ 1",
-    category: "นักกีฬา",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "athlete-1",
-  },
-  {
-    id: 7,
-    name: "ศิลปินคนที่ 1",
-    category: "ศิลปิน",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "artist-1",
-  },
-  {
-    id: 8,
-    name: "นักธุรกิจคนที่ 1",
-    category: "นักธุรกิจ",
-    image:
-      "https://pbs.twimg.com/profile_images/1115320085709611009/pZXpW18L_400x400.jpg",
-    slug: "businessman-1",
-  },
-]);
+import { ref, onMounted, onUnmounted, computed } from "vue";
+
+const { $supabase } = useNuxtApp();
+
+// Reactive data
+const celeb = ref([]);
+const loading = ref(true);
+
+const fetchCeleb = async () => {
+  try {
+    loading.value = true;
+    const { data, error } = await $supabase
+      .from("celeb")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching celeb:", error);
+      celeb.value = [];
+    } else {
+      celeb.value = data || [];
+      console.log("Fetched celeb:", data);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    celeb.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Slider state
 const currentSlide = ref(0);
@@ -189,25 +168,29 @@ const itemsPerSlide = ref(4);
 // Auto-play interval
 let autoplayInterval = null;
 
-// Split profiles into slides (4 profiles per slide)
+// Split profiles into slides (4 profiles per slide) - now using celeb data
 const profileSlides = computed(() => {
   const slides = [];
-  for (let i = 0; i < allProfiles.value.length; i += itemsPerSlide.value) {
-    slides.push(allProfiles.value.slice(i, i + itemsPerSlide.value));
+  for (let i = 0; i < celeb.value.length; i += itemsPerSlide.value) {
+    slides.push(celeb.value.slice(i, i + itemsPerSlide.value));
   }
   return slides;
 });
 
 // Slider methods
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % profileSlides.value.length;
+  if (profileSlides.value.length > 0) {
+    currentSlide.value = (currentSlide.value + 1) % profileSlides.value.length;
+  }
 };
 
 const prevSlide = () => {
-  currentSlide.value =
-    currentSlide.value === 0
-      ? profileSlides.value.length - 1
-      : currentSlide.value - 1;
+  if (profileSlides.value.length > 0) {
+    currentSlide.value =
+      currentSlide.value === 0
+        ? profileSlides.value.length - 1
+        : currentSlide.value - 1;
+  }
 };
 
 const goToSlide = (index) => {
@@ -216,9 +199,11 @@ const goToSlide = (index) => {
 
 const startAutoplay = () => {
   if (autoplayInterval) clearInterval(autoplayInterval);
-  autoplayInterval = setInterval(() => {
-    nextSlide();
-  }, 4000); // Auto-slide every 4 seconds
+  if (profileSlides.value.length > 1) {
+    autoplayInterval = setInterval(() => {
+      nextSlide();
+    }, 4000); // Auto-slide every 4 seconds
+  }
 };
 
 const stopAutoplay = () => {
@@ -241,24 +226,6 @@ const updateItemsPerSlide = () => {
   }
 };
 
-// Lifecycle hooks
-onMounted(() => {
-  updateItemsPerSlide();
-  startAutoplay();
-
-  // Add resize listener for responsive behavior
-  if (typeof window !== "undefined") {
-    window.addEventListener("resize", updateItemsPerSlide);
-  }
-});
-
-onUnmounted(() => {
-  stopAutoplay();
-  if (typeof window !== "undefined") {
-    window.removeEventListener("resize", updateItemsPerSlide);
-  }
-});
-
 // Pause autoplay on hover
 const handleMouseEnter = () => {
   stopAutoplay();
@@ -268,12 +235,31 @@ const handleMouseLeave = () => {
   startAutoplay();
 };
 
-// Add mouse events to the slider container
-onMounted(() => {
+// Lifecycle hooks
+onMounted(async () => {
+  // Fetch celebrity data first
+  await fetchCeleb();
+  
+  updateItemsPerSlide();
+  startAutoplay();
+
+  // Add resize listener for responsive behavior
+  if (typeof window !== "undefined") {
+    window.addEventListener("resize", updateItemsPerSlide);
+  }
+
+  // Add mouse events to the slider container
   const sliderContainer = document.querySelector(".bg-gray-100");
   if (sliderContainer) {
     sliderContainer.addEventListener("mouseenter", handleMouseEnter);
     sliderContainer.addEventListener("mouseleave", handleMouseLeave);
+  }
+});
+
+onUnmounted(() => {
+  stopAutoplay();
+  if (typeof window !== "undefined") {
+    window.removeEventListener("resize", updateItemsPerSlide);
   }
 });
 </script>
@@ -296,5 +282,19 @@ onMounted(() => {
 
 .overflow-hidden::-webkit-scrollbar {
   display: none;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>

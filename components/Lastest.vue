@@ -51,13 +51,13 @@
           </div>
 
           <div class="space-y-4">
-            <div v-for="event in events" :key="event.id" class="flex gap-4 items-center bg-[#F8F8F8] p-2 border-[#E9E9E9]">
+            <div v-for="event in eventsWithFormattedDate" :key="event.id" class="flex gap-4 items-center bg-[#F8F8F8] p-2 border-[#E9E9E9]">
               <div class="text-center flex-shrink-0 w-16">
                 <div class="text-3xl font-bold text-blue-500">{{ event.day }}</div>
                 <div class="text-xs text-gray-600 font-medium">{{ event.month }}</div>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 mb-1">{{ event.title }}</h3>
+                <h3 class="font-semibold text-gray-900 mb-1">{{ event.name }}</h3>
                 <div class="text-sm text-gray-500" style="font-weight: 300;">{{ event.location }}</div>
               </div>
             </div>
@@ -146,6 +146,7 @@ const { $supabase } = useNuxtApp();
 
 // Reactive data
 const news = ref([]);
+const event = ref([]);
 const loading = ref(true);
 
 const fetchnews = async () => {
@@ -171,45 +172,57 @@ const fetchnews = async () => {
   }
 };
 
+const fetchEvent = async () => {
+  try {
+    loading.value = true;
+    const { data, error } = await $supabase
+      .from("event")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching event:", error);
+      event.value = [];
+    } else {
+      event.value = data || [];
+      console.log("Fetched event:", data);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    event.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
 
 const newsArticles = computed(() => {
- 
   const highlightedArticle = news.value;
   return highlightedArticle || null;
 });
 
+// New computed property to format events with day and month
+const eventsWithFormattedDate = computed(() => {
+  if (!event.value) return [];
+  
+  return event.value.map(eventItem => {
+    const date = new Date(eventItem.date);
+    const day = date.getDate().toString();
+    const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+    
+    return {
+      ...eventItem,
+      day: day,
+      month: month
+    };
+  });
+});
 
-const events = ref([
-  {
-    id: 1,
-    day: '15',
-    month: 'JUL',
-    title: 'Sugarex Thailand 2025',
-    location: 'Central Khonkaen'
-  },
-  {
-    id: 2,
-    day: '16',
-    month: 'JUL',
-    title: 'Agri Expo Thailand 2025',
-    location: 'Central Khonkaen'
-  },
-  {
-    id: 3,
-    day: '17',
-    month: 'JUL',
-    title: 'Beyond Food Expo 2025',
-    location: 'Central Khonkaen'
-  },
-  {
-    id: 4,
-    day: '18',
-    month: 'JUL',
-    title: 'The Secret Sauce Business',
-    location: 'Central Khonkaen'
-  },
+// Keep the original events computed for backward compatibility
+const events = computed(() => {
+  const eventData = event.value;
+  return eventData || null;
+});
 
-])
 // Date formatting function
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -220,9 +233,11 @@ const formatDate = (dateString) => {
   };
   return date.toLocaleDateString("en-US", options).toUpperCase();
 };
+
 onMounted(async () => {
   // Fetch data from Supabase
   await fetchnews();
+  await fetchEvent();
 });
 </script>
 
