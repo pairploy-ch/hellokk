@@ -11,14 +11,14 @@
     <Celeb />
     <Property />
     <Investment />
-    <BannerAds />
+    <BannerAds :isFirst="true" />
     
     <Food />
     <Interview />
      
     <Travel />
     <Event />
-   <BannerAds />
+   <BannerAds :isFirst="false" />
     <Hotel />
   
     

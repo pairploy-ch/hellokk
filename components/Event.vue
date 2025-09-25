@@ -2,7 +2,7 @@
    <div class="min-h-screen relative overflow-hidden">
     <div class="absolute inset-0">
       <img 
-        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop" 
+        src="/bg-event2.jpg" 
         alt="Background"
         class="w-full h-full object-cover"
       >

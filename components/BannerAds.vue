@@ -35,6 +35,11 @@
 import { ref, onMounted, computed, onUnmounted } from 'vue';
 const { $supabase } = useNuxtApp();
 
+const props = defineProps({
+  
+  isFirst: { type: Boolean, default: true },
+})
+
 const bannerAd = ref(null) // เปลี่ยนจาก bannerAds เป็น bannerAd (singular)
 const loading = ref(true)
 
@@ -44,7 +49,8 @@ const fetchBannerAds = async () => {
     const { data, error } = await $supabase
       .from('bannerads')
       .select('*')
-      .eq("is_first", true)
+      .eq("is_main", false)
+      .eq("is_first",  props.isFirst)
       .order('created_at', { ascending: false })
       .limit(1)
      
