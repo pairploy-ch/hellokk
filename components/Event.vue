@@ -20,8 +20,15 @@
       <h2 class="text-white text-5xl md:text-6xl" style="font-weight: 500;">กิจกรรมที่น่าสนใจ</h2>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="relative text-center py-16 z-10">
+      <div class="flex justify-center items-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    </div>
+
     <!-- Main Content Grid -->
-    <div class="relative max-w-7xl mx-auto px-6 pb-20 z-10">
+    <div v-else class="relative max-w-7xl mx-auto px-6 pb-20 z-10">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[500px]">
         
         <!-- Main Large Card - Left (Featured Attraction) -->
@@ -31,8 +38,8 @@
         >
           <div class="relative h-[20rem]">
             <img 
-              :src="featuredAttraction.image" 
-              :alt="featuredAttraction.title"
+              :src="featuredAttraction.cover" 
+              :alt="featuredAttraction.name"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             >
             <div class="absolute top-4 right-4">
@@ -49,8 +56,11 @@
           <div class="p-5">
             <p class="text-gray-500 text-sm mb-2" style="font-weight: 400;">{{ featuredAttraction.category }}</p>
             <h3 class="text-base font-bold text-gray-800 mb-4 leading-tight" style="font-weight: 600;">
-              {{ featuredAttraction.title }}
+              {{ featuredAttraction.name }}
             </h3>
+            <p v-if="featuredAttraction.content" class="text-sm text-gray-600 mb-4 line-clamp-2">
+              {{ featuredAttraction.content }}
+            </p>
             <button 
               @click="handleMoreClick(featuredAttraction)"
               class="flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
@@ -75,13 +85,13 @@
             <div class="relative h-[10rem]">
               <img 
                 :src="attraction.image" 
-                :alt="attraction.title"
+                :alt="attraction.name"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               >
               <!-- Conditional rendering for watermark or share button -->
               <div v-if="attraction.hasWatermark" class="absolute bottom-2 right-2">
                 <div class="bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md">
-                  <span class="text-white text-xs font-medium">teeID Travel</span>
+                  <span class="text-white text-xs font-medium">teeID event</span>
                 </div>
               </div>
               <div v-else class="absolute top-2 right-2">
@@ -98,8 +108,11 @@
             <div class="p-3">
               <p class="text-gray-500 text-xs mb-1" style="font-weight: 400;">{{ attraction.category }}</p>
               <h3 class="text-sm font-bold text-gray-800 mb-2 leading-tight" style="font-weight: 600;">
-                {{ attraction.title }}
+                {{ attraction.name }}
               </h3>
+              <!-- <p v-if="attraction.content" class="text-xs text-gray-600 mb-2 line-clamp-2">
+                {{ attraction.content }}
+              </p> -->
               <button 
                 @click="handleMoreClick(attraction)"
                 class="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
@@ -115,6 +128,11 @@
 
         </div>
       </div>
+
+      <!-- No Data State -->
+      <div v-if="event.length === 0 && !loading" class="text-center text-white py-16">
+        <p>ยังไม่มีข้อมูลสถานที่ท่องเที่ยว</p>
+      </div>
     </div>
 
     <!-- Explore More Button -->
@@ -127,65 +145,63 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted, computed } from "vue";
+const { $supabase } = useNuxtApp();
 
-// Reactive data for attractions
-const attractions = ref([
-  {
-    id: 1,
-    category: 'สวนสาธารณะ',
-    title: 'ม่วงแผนนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก แนะนำ กิ่งกิ้วยอบแห้นในบ้องอย่าง "บ่อนก่ิ้นนท์" สีวเป็นที่เที่ยวขอบแก้นก่อนไปบางง่ายสะดวกสุด ๆ ...',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
-    featured: true
-  },
-  {
-    id: 2,
-    category: 'สวนสาธารณะ',
-    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
-    image: 'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400&h=200&fit=crop'
-  },
-  {
-    id: 3,
-    category: 'สวนสาธารณะ',
-    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
-    image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=200&fit=crop'
-  },
-  {
-    id: 4,
-    category: 'สวนสาธารณะ',
-    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
-    hasWatermark: true
-  },
-  {
-    id: 5,
-    category: 'สวนสาธารณะ',
-    title: 'ม่วงกิ้นนนท์ - ถ้ำมากไกรมีเวลาที่เที่ยวขอบแก้นก่อนไปมาก',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop'
+// Reactive data
+const event = ref([]);
+const loading = ref(true);
+
+const fetchevent = async () => {
+  try {
+    loading.value = true;
+    const { data, error } = await $supabase
+      .from("event")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching event:", error);
+      event.value = [];
+    } else {
+      event.value = data || [];
+      console.log("Fetched event:", data);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    event.value = [];
+  } finally {
+    loading.value = false;
   }
-])
+};
 
-// Computed properties to separate featured and regular attractions
+// Computed properties to separate featured and regular attractions from database
 const featuredAttraction = computed(() => {
-  return attractions.value.find(attraction => attraction.featured)
-})
+  // เอาสถานที่แรกเป็น featured (หรือใช้เงื่อนไขอื่น เช่น is_featured field)
+  return event.value[0] || null;
+});
 
 const regularAttractions = computed(() => {
-  return attractions.value.filter(attraction => !attraction.featured).slice(0, 4)
-})
+  // เอาสถานที่ที่เหลือเป็น regular cards (สูงสุด 4 แห่ง)
+  return event.value.slice(1, 5);
+});
 
 // Methods
 const handleMoreClick = (attraction) => {
-  console.log('More clicked for:', attraction.title)
+  console.log('More clicked for:', attraction.name);
   // Add navigation logic here
-  // For example: router.push(`/attraction/${attraction.id}`)
-}
+  // For example: navigateTo(`/event/${attraction.id}`)
+};
 
 const handleShareClick = (attraction) => {
-  console.log('Share clicked for:', attraction.title)
+  console.log('Share clicked for:', attraction.name);
   // Add share logic here
   // For example: share attraction URL or open share modal
-}
+};
+
+onMounted(async () => {
+  await fetchevent();
+});
 </script>
 
 <style scoped>
@@ -221,5 +237,20 @@ const handleShareClick = (attraction) => {
 /* Glassmorphism effect for buttons */
 .backdrop-blur-sm {
   backdrop-filter: blur(4px);
+}
+
+/* Line clamp utility for content truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
