@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 py-6">
+  <div class="max-w-7xl mx-auto px-4 py-6">
     <div class="flex gap-6">
       <!-- Left Column: News & Events -->
       <div class="flex-1 flex gap-8">
@@ -18,20 +18,20 @@
           <div class="space-y-4">
             <article v-for="article in newsArticles" :key="article.id" class="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
               <div class="w-24 h-20 flex-shrink-0">
-                <img :src="article.image" :alt="article.title" class="w-full h-full object-cover">
+                <img :src="article.cover" :alt="article.title" class="w-full h-full object-cover">
               </div>
               <div class="flex-1">
                 <div class="text-xs text-gray-500 mb-1 flex items-center gap-2 font-light" >
                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                   </svg>
-                  {{ article.date }}
+                  {{ formatDate(article.created_at) }}
                 </div>
                 <h3 class="font-semibold text-gray-900 text-sm leading-tight mb-2">
                   {{ article.title }}
                 </h3>
                 <div class="text-xs text-gray-600">
-                  BY <span class="font-medium">{{ article.author }}</span>
+                  BY <span class="font-medium">ADMIN</span>
                 </div>
               </div>
             </article>
@@ -140,30 +140,44 @@ data-show-facepile="false"></div>
 </template>
 
 <script setup>
-// Sample data - replace with your actual data source
-const newsArticles = ref([
-  {
-    id: 1,
-    title: 'เจรียษก่อนไปรองแล้วมะ! "ขอนแก่นใบเฒ่า" ไปร้องบริษเตรียมสร้างรถไฟฟ้าราอนา',
-    date: 'DECEMBER 9, 2025',
-    author: 'ADMIN',
-    image: 'https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
-  },
-  {
-    id: 2,
-    title: 'เจรียษก่อนไปรองแล้วมะ! "ขอนแก่นใบเฒ่า" ไปร้องบริษเตรียมสร้างรถไฟฟ้าราอนา',
-    date: 'DECEMBER 9, 2025',
-    author: 'ADMIN',
-    image: 'https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
-  },
-  {
-    id: 3,
-    title: 'เจรียษก่อนไปรองแล้วมะ! "ขอนแก่นใบเฒ่า" ไปร้องบริษเตรียมสร้างรถไฟฟ้าราอนา',
-    date: 'DECEMBER 9, 2025',
-    author: 'ADMIN',
-    image: 'https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+import { ref, onMounted, computed } from "vue";
+
+const { $supabase } = useNuxtApp();
+
+// Reactive data
+const news = ref([]);
+const loading = ref(true);
+
+const fetchnews = async () => {
+  try {
+    loading.value = true;
+    const { data, error } = await $supabase
+      .from("news")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching news:", error);
+      news.value = [];
+    } else {
+      news.value = data || [];
+      console.log("Fetched news:", data);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    news.value = [];
+  } finally {
+    loading.value = false;
   }
-])
+};
+
+
+const newsArticles = computed(() => {
+ 
+  const highlightedArticle = news.value;
+  return highlightedArticle || null;
+});
+
 
 const events = ref([
   {
@@ -196,6 +210,20 @@ const events = ref([
   },
 
 ])
+// Date formatting function
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return date.toLocaleDateString("en-US", options).toUpperCase();
+};
+onMounted(async () => {
+  // Fetch data from Supabase
+  await fetchnews();
+});
 </script>
 
 <style scoped>
