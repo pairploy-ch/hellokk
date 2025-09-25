@@ -105,6 +105,7 @@ const fetchBannerAds = async () => {
     const { data, error } = await $supabase
       .from('bannerads')
       .select('*')
+      .eq("is_main", true)
       .order('created_at', { ascending: false })
 
     if (error) {
