@@ -1,5 +1,5 @@
 <template>
-  <section class="py-16 max-w-7xl mx-auto">
+  <section class="py-16 max-w-7xl mx-auto px-6">
     <!-- Section Header -->
     <div class="flex items-center gap-3 mb-12">
       <h2 class="text-4xl font-medium text-black" style="font-weight: 600">
