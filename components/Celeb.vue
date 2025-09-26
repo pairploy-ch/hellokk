@@ -44,7 +44,7 @@
                   :key="profile.id"
                   class="flex flex-col items-start"
                 >
-                  <div class="flex">
+                  <div class="flex items-center">
                     <div class="w-20 h-20 rounded-full overflow-hidden mb-4">
                       <img
                         :src="profile.profile"
@@ -65,7 +65,7 @@
                       >
                         {{ profile.name }}
                       </h3>
-                      <NuxtLink
+                      <!-- <NuxtLink
                         :to="`/profile/${profile.slug}`"
                         class="text-blue-500 hover:text-blue-700 flex items-center gap-1 text-sm"
                         style="font-weight: 300"
@@ -84,7 +84,7 @@
                             d="M9 5l7 7-7 7"
                           ></path>
                         </svg>
-                      </NuxtLink>
+                      </NuxtLink> -->
                     </div>
                   </div>
                 </div>

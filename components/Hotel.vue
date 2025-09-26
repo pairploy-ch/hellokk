@@ -27,7 +27,7 @@
           >
             <div class="relative overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <img 
-                :src="restaurant.image" 
+                :src="restaurant.cover" 
                 :alt="restaurant.name"
                 class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
               >
@@ -50,7 +50,7 @@
           >
             <div class="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
               <img 
-                :src="restaurant.image" 
+                :src="restaurant.cover" 
                 :alt="restaurant.name"
                 class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               >
@@ -83,7 +83,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 const { $supabase } = useNuxtApp();
-
+import { useRoute, useRouter } from "vue-router";
+const router = useRouter();
 // Reactive data
 const hotel = ref([]);
 const loading = ref(true);
@@ -124,7 +125,7 @@ const regularRestaurants = computed(() => {
 
 // Methods for handling clicks
 const handleRestaurantClick = (restaurant) => {
-  console.log('Restaurant clicked:', restaurant);
+  router.push(`/hotel/${restaurant.id}`);
   // Add navigation logic here
   // เช่น navigateTo(`/restaurant/${restaurant.id}`)
 };

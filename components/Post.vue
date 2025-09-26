@@ -5,8 +5,8 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="container">
-        <h1 class="page-title">กิจกรรมทั้งหมด</h1>
-        <p class="page-subtitle">ติดตามข่าวสารและกิจกรรมล่าสุดของเรา</p>
+        <h1 class="page-title">{{title}}ทั้งหมด</h1>
+        <p class="page-subtitle">ติดตาม{{title}}ล่าสุดของเรา</p>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
             <select v-model="sortBy" @change="sortNews" class="filter-select">
               <option value="newest">ใหม่ล่าสุด</option>
               <option value="oldest">เก่าสุด</option>
-              <option value="popular">ยอดนิยม</option>
+           
             </select>
           </div>
           <div class="filter-group search-group">
@@ -27,7 +27,7 @@
               v-model="searchQuery"
               @input="searchNews"
               type="text"
-              placeholder="ค้นหากิจกรรม..."
+              placeholder="ค้นหา..."
               class="search-input"
             />
             <SearchIcon class="search-icon" />
@@ -49,7 +49,7 @@
       <div class="container">
         <!-- Results Info -->
         <div class="results-info" v-if="!loading">
-          <p>พบ {{ filteredNews.length }} กิจกรรม</p>
+          <p>พบ {{ filteredNews.length }} บทความ</p>
         </div>
 
         <!-- No Results -->
@@ -73,7 +73,7 @@
             <div class="card-image">
               <img
                 :src="article.cover || '/images/default-news.jpg'"
-                :alt="article.title"
+                :alt="article.name"
                 loading="lazy"
               />
               <div class="card-overlay">
@@ -86,7 +86,7 @@
 
             <!-- Card Content -->
             <div class="card-content">
-              <h3 class="card-title">{{ article.title }}</h3>
+              <h3 class="card-title">{{ article.name }}</h3>
 
               <div class="card-excerpt" v-if="article.content">
                 {{ getExcerpt(article.content) }}
@@ -169,6 +169,12 @@ const { $supabase } = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 
+const props = defineProps({
+  title: { type: String, required: true },
+  slug: { type: String, required: true },
+//   content: { type: String, default: '' }
+})
+
 // Reactive data
 const news = ref([]);
 const loading = ref(true);
@@ -183,7 +189,7 @@ const fetchNews = async () => {
   try {
     loading.value = true;
     const { data, error } = await $supabase
-      .from("event")
+      .from(props.slug)
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -288,7 +294,7 @@ const visiblePages = computed(() => {
 
 // Methods
 const navigateToArticle = (id) => {
-  router.push(`/events/${id}`);
+  router.push(`/${props.slug}/${id}`);
 };
 
 const filterNews = () => {

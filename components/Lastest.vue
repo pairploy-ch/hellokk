@@ -51,7 +51,7 @@
           </div>
 
           <div class="space-y-4">
-            <div v-for="event in eventsWithFormattedDate" :key="event.id" class="flex gap-4 items-center bg-[#F8F8F8] p-2 border-[#E9E9E9]">
+            <div @click="navigateToEvent(event.id)" v-for="event in eventsWithFormattedDate" :key="event.id" class="flex gap-4 items-center bg-[#F8F8F8] p-2 border-[#E9E9E9] cursor-pointer">
               <div class="text-center flex-shrink-0 w-16">
                 <div class="text-3xl font-bold text-blue-500">{{ event.day }}</div>
                 <div class="text-xs text-gray-600 font-medium">{{ event.month }}</div>
@@ -154,7 +154,9 @@ const navigateToArticle = (articleId) => {
   router.push(`/news/${articleId}`);
 };
 
-
+const navigateToEvent = (eventId) => {
+  router.push(`/events/${eventId}`);
+};
 const fetchnews = async () => {
   try {
     loading.value = true;

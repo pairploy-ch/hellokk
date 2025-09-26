@@ -137,9 +137,12 @@
 
     <!-- Explore More Button -->
     <div class="relative text-center pb-16 z-10">
-      <button class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-12 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+        <NuxtLink
+        to="/events"
+        class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-12 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+      >
         Explore More
-      </button>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -147,7 +150,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 const { $supabase } = useNuxtApp();
-
+import { useRoute, useRouter } from "vue-router";
+const router = useRouter();
 // Reactive data
 const event = ref([]);
 const loading = ref(true);
@@ -188,7 +192,8 @@ const regularAttractions = computed(() => {
 
 // Methods
 const handleMoreClick = (attraction) => {
-  console.log('More clicked for:', attraction.name);
+  router.push(`/events/${attraction.id}`);
+  // console.log('More clicked for:', attraction.name);
   // Add navigation logic here
   // For example: navigateTo(`/event/${attraction.id}`)
 };

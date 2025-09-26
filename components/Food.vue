@@ -27,7 +27,7 @@
           >
             <div class="relative overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <img 
-                :src="restaurant.image" 
+                :src="restaurant.cover" 
                 :alt="restaurant.name"
                 class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
               >
@@ -50,7 +50,7 @@
           >
             <div class="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
               <img 
-                :src="restaurant.image" 
+                :src="restaurant.cover" 
                 :alt="restaurant.name"
                 class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               >
@@ -83,7 +83,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 const { $supabase } = useNuxtApp();
-
+import { useRoute, useRouter } from "vue-router";
 // Reactive data
 const foods = ref([]);
 const loading = ref(true);
@@ -110,7 +110,7 @@ const fetchfoods = async () => {
     loading.value = false;
   }
 };
-
+const router = useRouter();
 // Computed properties to filter restaurants from database
 const featuredRestaurants = computed(() => {
   // แสดงร้านแรก 2 ร้านเป็น featured (หรือใช้เงื่อนไขอื่น เช่น is_featured field)
@@ -124,7 +124,8 @@ const regularRestaurants = computed(() => {
 
 // Methods for handling clicks
 const handleRestaurantClick = (restaurant) => {
-  console.log('Restaurant clicked:', restaurant);
+  // console.log('Restaurant clicked:', restaurant);
+  router.push(`/foods/${restaurant.id}`);
   // Add navigation logic here
   // เช่น navigateTo(`/restaurant/${restaurant.id}`)
 };
