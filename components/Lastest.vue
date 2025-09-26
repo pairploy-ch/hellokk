@@ -16,7 +16,7 @@
           </div>
 
           <div class="space-y-4">
-            <article v-for="article in newsArticles" :key="article.id" class="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
+            <article @click="navigateToArticle(article.id)" v-for="article in newsArticles" :key="article.id" class="flex gap-4 pb-4 border-b border-gray-200 last:border-0 cursor-pointer">
               <div class="w-24 h-20 flex-shrink-0">
                 <img :src="article.cover" :alt="article.title" class="w-full h-full object-cover">
               </div>
@@ -141,13 +141,19 @@ data-show-facepile="false"></div>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-
+import { useRoute, useRouter } from "vue-router";
 const { $supabase } = useNuxtApp();
 
 // Reactive data
+const router = useRouter();
 const news = ref([]);
 const event = ref([]);
 const loading = ref(true);
+
+const navigateToArticle = (articleId) => {
+  router.push(`/news/${articleId}`);
+};
+
 
 const fetchnews = async () => {
   try {

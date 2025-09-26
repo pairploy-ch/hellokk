@@ -29,8 +29,9 @@
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Main Featured Article (Left) -->
       <div class="lg:col-span-2" v-if="mainArticle">
-        <article class="group cursor-pointer h-full">
-          <div class="relative h-[448px] overflow-hidden bg-gray-100">
+        <article class="group cursor-pointer h-full"  >
+          <div class="relative h-[448px] overflow-hidden bg-gray-100" @click="navigateToArticle(mainArticle.id)">
+           
             <img
               :src="mainArticle.cover"
               :alt="mainArticle.title"
@@ -71,6 +72,7 @@
           v-for="article in sidebarArticles"
           :key="article.id"
           class="group cursor-pointer flex gap-4"
+          @click="navigateToArticle(article.id)"
         >
           <!-- Image -->
           <div
@@ -122,13 +124,14 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-
+import { useRoute, useRouter } from "vue-router";
 const { $supabase } = useNuxtApp();
 
 // Reactive data
 const news = ref([]);
 const loading = ref(true);
-
+const route = useRoute();
+const router = useRouter();
 // Fetch news data from Supabase
 const fetchnews = async () => {
   try {
@@ -187,6 +190,11 @@ const getCategoryColor = (category) => {
     SPORTS: "bg-green-500",
   };
   return colors[category] || "bg-gray-500";
+};
+
+// Navigation function
+const navigateToArticle = (articleId) => {
+  router.push(`/news/${articleId}`);
 };
 
 onMounted(async () => {
