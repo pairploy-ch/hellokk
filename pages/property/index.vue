@@ -203,6 +203,8 @@ import { ref, onMounted, computed, watch } from "vue";
 import Header from "~/components/Header.vue";
 import Footer from "~/components/Footer.vue";
 const { $supabase } = useNuxtApp();
+import { useRoute, useRouter } from "vue-router";
+const router = useRouter();
 
 // Reactive data
 const allProperties = ref([]);
@@ -409,7 +411,8 @@ const formatTimeAgo = (dateString) => {
 };
 
 const handlePropertyClick = (propertyItem) => {
-  console.log('Property clicked:', propertyItem);
+  // console.log('Property clicked:', propertyItem);
+    router.push(`/property/${propertyItem.id}`);
   // Navigate to property detail
   // Example: navigateTo(`/property/${propertyItem.id}`)
 };

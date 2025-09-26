@@ -23,15 +23,14 @@
               class="text-black font-medium mb-1 flex"
               style="font-weight: 400; align-content: center"
             >
+
               <span
-                ><Icon
-                  icon="material-symbols:bed-outline-sharp"
-                  width="20"
-                  height="20"
-              /></span>
-              <span class="ml-2">hellokk@hellokk.com</span>
+                >
+              <Mail class="search-icon" />
+              </span>
+              <span class="ml-2">talktosipim@gmail.com</span>
             </p>
-            <p
+            <!-- <p
               class="text-black font-medium mb-1 flex"
               style="font-weight: 400; align-content: center"
             >
@@ -42,7 +41,7 @@
                   height="20"
               /></span>
               <span class="ml-2">(202) 288 8936</span>
-            </p>
+            </p> -->
           </div>
         </div>
 
@@ -52,7 +51,7 @@
           <ul class="space-y-3">
             <li>
               <a
-                href="#"
+                href="/news"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >News</a
@@ -60,7 +59,7 @@
             </li>
             <li>
               <a
-                href="#"
+                href="/events"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Event</a
@@ -75,7 +74,7 @@
           <ul class="space-y-3">
             <li>
               <a
-                href="#"
+                href="/foods"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Food</a
@@ -83,7 +82,7 @@
             </li>
    <li>
               <a
-                href="#"
+                href="/travel"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Tourist</a
@@ -91,7 +90,7 @@
             </li>
              <li>
               <a
-                href="#"
+                href="/hotel"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Hotel</a
@@ -106,7 +105,7 @@
           <ul class="space-y-3">
            <li>
               <a
-                href="#"
+                href="/property"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Buy/Rent/Sell</a
@@ -114,7 +113,7 @@
             </li>
              <li>
               <a
-                href="#"
+                href="/#investment"
                 class="text-gray-600 hover:text-black transition-colors"
                 style="font-weight: 400"
                 >Investment</a
@@ -134,7 +133,7 @@
             </p>
           </div>
           <NuxtLink
-            to="/contact"
+            to="mailto:talktosipim@gmail.com"
             class="bg-black text-white px-6 py-2 rounded-md transition-colors font-medium"
           >
             Contact Us
@@ -153,8 +152,12 @@
 </template>
 
 <script setup>
+import {
+  Mail
+} from "lucide-vue-next";
 // No additional JavaScript needed for this component
 import { Icon } from "@iconify/vue";
+
 </script>
 
 <style scoped>

@@ -70,7 +70,7 @@
 
         <!-- Success Message -->
         <div v-if="showSuccess" class="mt-4 p-3 bg-green-500/90 text-white rounded-lg backdrop-blur-sm">
-          <p class="text-sm">ขอบคุณสำหรับการสมัครสมาชิก!</p>
+          <p class="text-sm">โปรดรอการติดต่อกลับ!</p>
         </div>
 
         <!-- Error Message -->
